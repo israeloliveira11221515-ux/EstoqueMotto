@@ -21,7 +21,8 @@ const Inventory: React.FC = () => {
     quantity: 0,
     min_stock: 5,
     price_cost: 0,
-    price_sell: 0
+    price_sell: 0,
+    observation: ''
   });
 
   useEffect(() => {
@@ -36,7 +37,8 @@ const Inventory: React.FC = () => {
 
   const filtered = products.filter(p => 
     p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    p.sku?.toLowerCase().includes(searchTerm.toLowerCase())
+    p.sku?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.observation?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const saveToStorage = (list: Product[]) => {
@@ -90,12 +92,13 @@ const Inventory: React.FC = () => {
       min_stock: newProduct.min_stock || 5,
       price_cost: newProduct.price_cost || 0,
       price_sell: newProduct.price_sell || 0,
+      observation: newProduct.observation || '',
       id: Math.random().toString(36).substr(2, 9)
     };
     const updated = [...products, productToAdd];
     saveToStorage(updated);
     setIsAddModalOpen(false);
-    setNewProduct({ name: '', sku: '', quantity: 0, min_stock: 5, price_cost: 0, price_sell: 0 });
+    setNewProduct({ name: '', sku: '', quantity: 0, min_stock: 5, price_cost: 0, price_sell: 0, observation: '' });
   };
 
   return (
@@ -117,7 +120,7 @@ const Inventory: React.FC = () => {
         <div className="relative flex-1">
           <input 
             type="text" 
-            placeholder="Buscar por nome ou SKU..."
+            placeholder="Buscar por nome, SKU ou descrição..."
             className="w-full pl-12 pr-4 py-3 rounded-2xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -143,6 +146,9 @@ const Inventory: React.FC = () => {
                 <td className="px-8 py-6">
                   <div className="font-bold text-slate-800">{p.name}</div>
                   <div className="text-xs text-slate-400 font-medium tracking-tight uppercase">{p.sku || 'Sem SKU'}</div>
+                  {p.observation && (
+                    <div className="text-[10px] text-slate-400 italic mt-1 line-clamp-1 max-w-xs">{p.observation}</div>
+                  )}
                 </td>
                 <td className="px-8 py-6">
                   <span className={`px-3 py-1 rounded-lg text-sm font-black ${p.quantity <= p.min_stock ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-slate-600'}`}>
@@ -174,7 +180,7 @@ const Inventory: React.FC = () => {
               <h3 className="text-xl font-black text-slate-800 italic">Editar Peça</h3>
               <button onClick={() => setEditingProduct(null)} className="text-slate-400 hover:text-slate-600 font-bold">✕</button>
             </div>
-            <div className="p-8 space-y-6">
+            <div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto">
               <div>
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Nome</label>
                 <input type="text" className="w-full px-4 py-3 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium" value={editingProduct.name} onChange={e => setEditingProduct({...editingProduct, name: e.target.value})} />
@@ -189,9 +195,24 @@ const Inventory: React.FC = () => {
                   <input type="number" className="w-full px-4 py-3 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-black text-blue-600" value={editingProduct.price_sell} onChange={e => setEditingProduct({...editingProduct, price_sell: parseFloat(e.target.value) || 0})} />
                 </div>
               </div>
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Qtd em Estoque</label>
+                  <input type="number" className="w-full px-4 py-3 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-black" value={editingProduct.quantity} onChange={e => setEditingProduct({...editingProduct, quantity: parseInt(e.target.value) || 0})} />
+                </div>
+                <div>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">SKU</label>
+                    <input type="text" className="w-full px-4 py-3 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-medium uppercase" value={editingProduct.sku || ''} onChange={e => setEditingProduct({...editingProduct, sku: e.target.value})} />
+                </div>
+              </div>
               <div>
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Ajuste de Estoque</label>
-                <input type="number" className="w-full px-4 py-3 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-black" value={editingProduct.quantity} onChange={e => setEditingProduct({...editingProduct, quantity: parseInt(e.target.value) || 0})} />
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Observação / Descrição</label>
+                <textarea 
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-medium resize-none h-24" 
+                  value={editingProduct.observation || ''} 
+                  onChange={e => setEditingProduct({...editingProduct, observation: e.target.value})}
+                  placeholder="Informações adicionais da peça..."
+                />
               </div>
             </div>
             <div className="p-8 bg-slate-50 flex gap-4">
@@ -209,7 +230,7 @@ const Inventory: React.FC = () => {
               <h3 className="text-xl font-black text-slate-800 italic">Nova Peça</h3>
               <button onClick={() => setIsAddModalOpen(false)} className="text-slate-400 hover:text-slate-600 font-bold">✕</button>
             </div>
-            <div className="p-8 space-y-6">
+            <div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto">
               <div>
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Nome</label>
                 <input type="text" className="w-full px-4 py-3 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium" value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} placeholder="Ex: Óleo 5W30" />
@@ -237,6 +258,15 @@ const Inventory: React.FC = () => {
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Estoque Mínimo</label>
                   <input type="number" className="w-full px-4 py-3 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-black text-red-500" value={newProduct.min_stock} onChange={e => setNewProduct({...newProduct, min_stock: parseInt(e.target.value) || 0})} />
                 </div>
+              </div>
+              <div>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Observação / Descrição</label>
+                <textarea 
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 font-medium resize-none h-24" 
+                  value={newProduct.observation} 
+                  onChange={e => setNewProduct({...newProduct, observation: e.target.value})}
+                  placeholder="Adicione uma descrição detalhada da peça..."
+                />
               </div>
             </div>
             <div className="p-8 bg-slate-50 flex gap-4">

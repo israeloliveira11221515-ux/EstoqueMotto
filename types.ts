@@ -43,6 +43,7 @@ export interface SystemSettings {
   phone_whatsapp: string;
   logo_url?: string;
   manager_name: string;
+  manager_photo?: string;
   gestor_pin_hash: string;
   max_discount_sem_pin: number;
 }
@@ -55,6 +56,7 @@ export interface Product {
   min_stock: number;
   price_cost: number;
   price_sell: number;
+  observation?: string;
 }
 
 export interface Service {

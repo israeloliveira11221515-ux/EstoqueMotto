@@ -90,7 +90,7 @@ const Login: React.FC = () => {
               <p className="text-slate-400 text-sm font-medium">Digite seu código de acesso</p>
             </div>
 
-            <div className="flex justify-center gap-4 mb-10">
+            <div className="flex justify-center gap-2 mb-10">
               {[...Array(4)].map((_, i) => (
                 <div 
                   key={i} 

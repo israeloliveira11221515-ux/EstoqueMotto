@@ -186,11 +186,11 @@ const Setup: React.FC = () => {
                   <div className="grid grid-cols-2 gap-6">
                     <div>
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Definir PIN (4 dígitos)</label>
-                      <input name="pin" type="password" maxLength={4} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 text-center text-2xl tracking-widest font-black" value={formData.pin} onChange={handleChange} />
+                      <input name="pin" type="password" maxLength={4} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 text-center text-2xl font-black" value={formData.pin} onChange={handleChange} />
                     </div>
                     <div>
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Confirmar PIN</label>
-                      <input name="pinConfirm" type="password" maxLength={4} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 text-center text-2xl tracking-widest font-black" value={formData.pinConfirm} onChange={handleChange} />
+                      <input name="pinConfirm" type="password" maxLength={4} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 text-center text-2xl font-black" value={formData.pinConfirm} onChange={handleChange} />
                     </div>
                   </div>
                 </div>

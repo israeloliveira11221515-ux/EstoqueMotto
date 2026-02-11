@@ -64,7 +64,7 @@ const PinConfirmModal: React.FC<PinConfirmModalProps> = ({
         </div>
 
         <div className="p-10">
-          <div className="flex justify-center gap-4 mb-10">
+          <div className="flex justify-center gap-2 mb-10">
             {[...Array(4)].map((_, i) => (
               <div key={i} className={`w-4 h-4 rounded-full border-2 transition-all ${pin.length > i ? 'bg-blue-600 border-blue-600 scale-125 shadow-[0_0_10px_#3b82f6]' : 'bg-transparent border-slate-200'}`}></div>
             ))}
