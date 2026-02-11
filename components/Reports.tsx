@@ -1,14 +1,20 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PinConfirmModal from './PinConfirmModal';
 import { Sale, WorkOrder, Product, Commission } from '../types';
 
 const Reports: React.FC = () => {
+  const navigate = useNavigate();
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<{ title: string; id: string } | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
   const handleGenerateClick = (report: { title: string; id: string }) => {
+    if (report.id === 'checklist_pdf') {
+      navigate('/checklist');
+      return;
+    }
     setSelectedReport(report);
     setIsPinModalOpen(true);
   };
@@ -30,7 +36,6 @@ const Reports: React.FC = () => {
     
     setIsGenerating(true);
     
-    // Simulate processing time for "generation"
     setTimeout(() => {
       try {
         let csvContent = "";
@@ -90,6 +95,7 @@ const Reports: React.FC = () => {
     { id: 'comissoes', title: 'Relatório de Comissões', desc: 'Resumo de valores a pagar para cada funcionário.', icon: '🏷️' },
     { id: 'estoque', title: 'Giro de Estoque', desc: 'Análise de peças mais utilizadas e rentabilidade.', icon: '📦' },
     { id: 'faturamento', title: 'Faturamento por Período', desc: 'Visão macro do crescimento da oficina.', icon: '📈' },
+    { id: 'checklist_pdf', title: 'Checklist de Estoque (PDF)', desc: 'Gera documento de checklist pronto para impressão e conferência.', icon: '📋' },
   ];
 
   return (
@@ -118,7 +124,7 @@ const Reports: React.FC = () => {
             <button 
               onClick={() => handleGenerateClick(r)}
               disabled={isGenerating}
-              className="w-full bg-slate-900 text-white font-black py-4 rounded-2xl transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50"
+              className={`w-full ${r.id === 'checklist_pdf' ? 'bg-blue-600' : 'bg-slate-900'} text-white font-black py-4 rounded-2xl transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50`}
             >
               {isGenerating && selectedReport?.id === r.id ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -127,7 +133,7 @@ const Reports: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                 </svg>
               )}
-              {isGenerating && selectedReport?.id === r.id ? 'Gerando...' : 'Baixar Dados (CSV)'}
+              {r.id === 'checklist_pdf' ? 'Abrir para Imprimir (PDF)' : (isGenerating && selectedReport?.id === r.id ? 'Gerando...' : 'Baixar Dados (CSV)')}
             </button>
           </div>
         ))}
@@ -136,8 +142,7 @@ const Reports: React.FC = () => {
       <div className="bg-amber-50 border border-amber-100 p-8 rounded-[2rem] flex items-center gap-6">
          <div className="text-4xl">💡</div>
          <p className="text-amber-800 text-sm font-medium italic">
-           Os relatórios são exportados em formato <b>CSV</b>, compatível com Excel, Planilhas Google e outros sistemas de contabilidade. 
-           O download iniciará automaticamente após a confirmação do PIN.
+           Os relatórios financeiros são exportados em <b>CSV</b>. Para o <b>Checklist</b>, utilize a opção PDF para gerar um documento formatado para conferência física.
          </p>
       </div>
 

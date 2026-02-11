@@ -84,6 +84,15 @@ export interface Commission {
   created_at: string;
 }
 
+export interface Expense {
+  id: string;
+  description: string;
+  amount: number;
+  category: string;
+  date: string;
+  created_at: string;
+}
+
 export interface Sale {
   id: string;
   status: SaleStatus;
