@@ -1,0 +1,7 @@
+{
+  "name": "EstoqueMotto",
+  "description": "Complete workshop management system with role-based access control, inventory management, work orders, and financial tracking.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
