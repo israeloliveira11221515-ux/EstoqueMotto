@@ -14,9 +14,32 @@ const Cashier: React.FC = () => {
   const [cart, setCart] = useState<SaleItem[]>([]);
   const [discountVal, setDiscountVal] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.PIX);
+  const [installments, setInstallments] = useState(1);
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   
+  // Default interest rates if not in settings
+  const defaultRates: { [key: number]: number } = {
+    1: 0,
+    2: 3.5,
+    3: 4.8,
+    4: 5.9,
+    5: 6.8,
+    6: 7.9,
+    7: 8.9,
+    8: 9.9,
+    9: 10.9,
+    10: 11.9,
+    11: 12.9,
+    12: 13.9
+  };
+
+  const interestRate = useMemo(() => {
+    if (paymentMethod !== PaymentMethod.CREDITO) return 0;
+    const rates = settings?.card_interest_rates || defaultRates;
+    return rates[installments] || 0;
+  }, [paymentMethod, installments, settings]);
+
   // Receipt State
   const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
   const [lastSale, setLastSale] = useState<Sale | null>(null);
@@ -77,7 +100,8 @@ const Cashier: React.FC = () => {
   const remove = (id: string) => setCart(p => p.filter(i => i.product_id !== id));
 
   const subtotal = useMemo(() => cart.reduce((acc, i) => acc + i.subtotal, 0), [cart]);
-  const total = Math.max(0, subtotal - discountVal);
+  const interestValue = useMemo(() => (subtotal - discountVal) * (interestRate / 100), [subtotal, discountVal, interestRate]);
+  const total = Math.max(0, subtotal - discountVal + interestValue);
 
   const handleFinish = () => {
     if (cart.length === 0) return;
@@ -95,6 +119,8 @@ const Cashier: React.FC = () => {
       status: SaleStatus.PAGA,
       subtotal: subtotal,
       discount_value: discountVal,
+      interest_value: interestValue,
+      installments: paymentMethod === PaymentMethod.CREDITO ? installments : 1,
       total: total,
       actor_type: mode,
       created_at: new Date().toISOString(),
@@ -238,9 +264,36 @@ const Cashier: React.FC = () => {
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-3">Forma de Pagamento</label>
                 <div className="grid grid-cols-2 gap-3">
                    <button onClick={() => setPaymentMethod(PaymentMethod.PIX)} className={`py-4 rounded-2xl font-black text-sm transition-all ${paymentMethod === PaymentMethod.PIX ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-100 text-slate-400'}`}>PIX</button>
-                   <button onClick={() => setPaymentMethod(PaymentMethod.CREDITO)} className={`py-4 rounded-2xl font-black text-sm transition-all ${paymentMethod === PaymentMethod.CREDITO ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-100 text-slate-400'}`}>CARTÃO</button>
+                   <button onClick={() => setPaymentMethod(PaymentMethod.CREDITO)} className={`py-4 rounded-2xl font-black text-sm transition-all ${paymentMethod === PaymentMethod.CREDITO ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-100 text-slate-400'}`}>CRÉDITO</button>
+                   <button onClick={() => setPaymentMethod(PaymentMethod.DEBITO)} className={`py-4 rounded-2xl font-black text-sm transition-all ${paymentMethod === PaymentMethod.DEBITO ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-100 text-slate-400'}`}>DÉBITO</button>
+                   <button onClick={() => setPaymentMethod(PaymentMethod.DINHEIRO)} className={`py-4 rounded-2xl font-black text-sm transition-all ${paymentMethod === PaymentMethod.DINHEIRO ? 'bg-blue-600 text-white shadow-lg' : 'bg-slate-100 text-slate-400'}`}>DINHEIRO</button>
                 </div>
               </div>
+
+              {paymentMethod === PaymentMethod.CREDITO && (
+                <div className="pt-6 border-t border-slate-50 animate-in slide-in-from-top duration-300">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-3">Parcelamento</label>
+                  <select 
+                    className="w-full px-4 py-4 rounded-2xl border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500 font-black text-slate-700 text-lg appearance-none bg-white"
+                    value={installments}
+                    onChange={e => setInstallments(parseInt(e.target.value))}
+                  >
+                    {[1,2,3,4,5,6,7,8,9,10,11,12].map(n => (
+                      <option key={n} value={n}>
+                        {n}x {n > 1 ? `(Juros: ${((settings?.card_interest_rates || defaultRates)[n] || 0).toFixed(1)}%)` : '(À Vista)'}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {interestValue > 0 && (
+                <div className="flex justify-between font-medium text-amber-600 pt-4">
+                  <span className="text-sm">Acréscimo Cartão ({interestRate}%)</span>
+                  <span className="font-black italic">+ R$ {interestValue.toFixed(2)}</span>
+                </div>
+              )}
+
               <div className="pt-8 border-t border-slate-100 text-right">
                 <div className="text-slate-400 font-black text-[10px] uppercase">Total Líquido</div>
                 <div className="text-4xl font-black text-blue-600 italic tracking-tighter mb-8">R$ {total.toFixed(2)}</div>

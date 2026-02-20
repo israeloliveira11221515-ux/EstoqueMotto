@@ -95,6 +95,32 @@ const Profile: React.FC = () => {
               </div>
 
               {mode === 'GESTOR' && (
+                <div className="pt-10 border-t border-slate-100 space-y-8">
+                  <h4 className="text-lg font-black text-slate-700 italic border-l-4 border-amber-500 pl-4 uppercase tracking-tighter">Taxas de Juros (Cartão de Crédito)</h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(n => (
+                      <div key={n}>
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">{n}x (%)</label>
+                        <input 
+                          type="number" 
+                          step="0.1"
+                          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-amber-500 font-bold"
+                          value={settings?.card_interest_rates?.[n] || 0}
+                          onChange={(e) => {
+                            if (settings) {
+                              const newRates = { ...(settings.card_interest_rates || {}) };
+                              newRates[n] = parseFloat(e.target.value) || 0;
+                              updateSettings({ ...settings, card_interest_rates: newRates });
+                            }
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {mode === 'GESTOR' && (
                 <div className="pt-6">
                    <button 
                      onClick={() => alert('Para alterar dados sensíveis, utilize o menu de Configurações.')}

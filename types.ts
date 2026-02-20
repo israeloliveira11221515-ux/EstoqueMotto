@@ -23,7 +23,9 @@ export enum SaleStatus {
 
 export enum PaymentMethod {
   PIX = 'PIX',
-  CREDITO = 'CREDITO'
+  CREDITO = 'CREDITO',
+  DEBITO = 'DEBITO',
+  DINHEIRO = 'DINHEIRO'
 }
 
 export enum CommissionType {
@@ -46,6 +48,7 @@ export interface SystemSettings {
   manager_photo?: string;
   gestor_pin_hash: string;
   max_discount_sem_pin: number;
+  card_interest_rates?: { [installments: number]: number }; // e.g. { 1: 0, 2: 3.5, 3: 4.5 }
 }
 
 export interface Product {
@@ -98,6 +101,8 @@ export interface Sale {
   status: SaleStatus;
   subtotal: number;
   discount_value: number;
+  interest_value?: number;
+  installments?: number;
   total: number;
   actor_type: AccessMode;
   created_at: string;

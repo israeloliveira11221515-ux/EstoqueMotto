@@ -114,6 +114,12 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ isOpen, onClose, sale, sett
                   <span>- R$ {sale.discount_value.toFixed(2)}</span>
                 </div>
               )}
+              {sale.interest_value && sale.interest_value > 0 && (
+                <div className="flex justify-between text-amber-600 italic">
+                  <span>ACRÉSCIMO CARTÃO</span>
+                  <span>+ R$ {sale.interest_value.toFixed(2)}</span>
+                </div>
+              )}
               <div className="flex justify-between text-base font-black pt-2 border-t border-slate-100 mt-2">
                 <span>TOTAL</span>
                 <span className="text-blue-600">R$ {sale.total.toFixed(2)}</span>
@@ -123,7 +129,10 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({ isOpen, onClose, sale, sett
             <div className="mt-6 text-[10px] space-y-2">
               <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
                 <p className="font-black uppercase mb-1">Pagamento</p>
-                <p className="font-medium">{sale.payment_method || 'PIX'}</p>
+                <p className="font-medium">
+                  {sale.payment_method || 'PIX'} 
+                  {sale.installments && sale.installments > 1 ? ` - ${sale.installments}x` : ''}
+                </p>
               </div>
               <div className="text-center pt-8 border-t border-dashed border-slate-200 opacity-50">
                 <p className="uppercase font-black">Obrigado pela preferência!</p>
